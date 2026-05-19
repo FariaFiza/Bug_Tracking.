@@ -1,4 +1,5 @@
 ##🐛BUG TRACKING SYSTEM
+
 A Django-based web application that helps users submit their buggy code and get it fixed by professional developers. Users can choose their preferred developer, track bug status in real time, comment on reports, and give website feedback.
 
 
