@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} — BugHive{% endblock %}
+{% block extra_css %}
+<style>
+.form-layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; align-items: start; }
+.tips-card li { font-size: 0.83rem; color: var(--text2); margin-bottom: 0.5rem; padding-left: 0.5rem; }
+.tips-card li::marker { color: var(--accent2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>{{ title }}</h1>
+    <p>Provide as much detail as possible to help developers fix your bug faster</p>
+  </div>
+
+  <div class="form-layout">
+    <div class="card">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Bug Title *</label>
+          {{ form.title }}
+          {% if form.title.errors %}<ul class="errorlist">{% for e in form.title.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Language *</label>
+            {{ form.language }}
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority *</label>
+            {{ form.priority }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description *</label>
+          {{ form.description }}
+          {% if form.description.errors %}<ul class="errorlist">{% for e in form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Code Snippet</label>
+          <div class="code-lang-tag" style="margin-bottom:0.5rem">Paste your buggy code below</div>
+          {{ form.code_snippet }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Error Message / Traceback</label>
+          {{ form.error_message }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assign Developer</label>
+          <p style="font-size:0.8rem;color:var(--text2);margin-bottom:0.4rem">Choose which developer you want to fix your bug</p>
+          {{ form.assigned_developer }}
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:0.5rem">
+          <button type="submit" class="btn btn-primary">
+            {% if bug %}💾 Update Bug{% else %}🐛 Submit Bug Report{% endif %}
+          </button>
+          <a href="{% url 'bug_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+    <div>
+      <div class="card tips-card">
+        <div class="card-title">💡 Tips for a Great Bug Report</div>
+        <ul>
+          <li>Use a clear, specific title that summarizes the issue</li>
+          <li>Describe what you expected vs what happened</li>
+          <li>Include the exact error message or traceback</li>
+          <li>Paste the minimal code that reproduces the bug</li>
+          <li>Choose the correct programming language</li>
+          <li>Set priority: Critical for crashes, Low for cosmetic issues</li>
+          <li>Pick a developer who specializes in your language</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <div class="card-title">🎯 Priority Guide</div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.83rem">
+          <div><span class="badge badge-critical">Critical</span> <span style="color:var(--text2);margin-left:0.5rem">App crashes, data loss</span></div>
+          <div><span class="badge badge-high">High</span> <span style="color:var(--text2);margin-left:0.5rem">Major feature broken</span></div>
+          <div><span class="badge badge-medium">Medium</span> <span style="color:var(--text2);margin-left:0.5rem">Feature works but buggy</span></div>
+          <div><span class="badge badge-low">Low</span> <span style="color:var(--text2);margin-left:0.5rem">Minor / cosmetic issue</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

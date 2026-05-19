@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}Bug Reports — BugHive{% endblock %}
+{% block extra_css %}
+<style>
+.bug-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.bug-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.bug-card:hover { border-color: var(--border2); transform: translateX(4px); }
+.bug-card:hover::before { opacity: 1; }
+.bug-card-top { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem; }
+.bug-card-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 1rem; color: var(--text); flex: 1; }
+.bug-card-desc { color: var(--text2); font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.75rem; }
+.bug-card-footer { display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; color: var(--text2); flex-wrap: wrap; }
+.lang-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--accent3);
+  padding: 1px 8px;
+  border-radius: 4px;
+}
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text2);
+}
+.empty-state .big-emoji { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.empty-state h3 { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+.filters-row {
+  display: flex; gap: 0.75rem; align-items: center;
+  flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+.filters-row form { display: flex; gap: 0.75rem; flex-wrap: wrap; flex: 1; }
+.filters-row input, .filters-row select {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.5rem 0.875rem; color: var(--text); font-size: 0.875rem; outline: none;
+}
+.filters-row input:focus, .filters-row select:focus { border-color: var(--accent); }
+.filters-row input { flex: 1; min-width: 200px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div>
+        <h1>Bug Reports</h1>
+        <p>Track, assign, and resolve code issues</p>
+      </div>
+      {% if user.is_authenticated %}
+        <a href="{% url 'bug_create' %}" class="btn btn-primary">+ Report Bug</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="filters-row">
+    <form method="get">
+      <input type="text" name="q" value="{{ q }}" placeholder="🔍 Search bugs...">
+      <select name="status">
+        <option value="">All Status</option>
+        <option value="open" {% if status == 'open' %}selected{% endif %}>Open</option>
+        <option value="in_progress" {% if status == 'in_progress' %}selected{% endif %}>In Progress</option>
+        <option value="resolved" {% if status == 'resolved' %}selected{% endif %}>Resolved</option>
+        <option value="closed" {% if status == 'closed' %}selected{% endif %}>Closed</option>
+      </select>
+      <select name="priority">
+        <option value="">All Priority</option>
+        <option value="critical" {% if priority == 'critical' %}selected{% endif %}>Critical</option>
+        <option value="high" {% if priority == 'high' %}selected{% endif %}>High</option>
+        <option value="medium" {% if priority == 'medium' %}selected{% endif %}>Medium</option>
+        <option value="low" {% if priority == 'low' %}selected{% endif %}>Low</option>
+      </select>
+      <select name="language">
+        <option value="">All Languages</option>
+        <option value="python">Python</option>
+
+        <option value="java">Java</option>
+        <option value="cpp">C++</option>
+        <option value="csharp">C</option>
+
+        <option value="html">HTML</option>
+        <option value="sql">SQL</option>
+
+      </select>
+      <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+      {% if q or status or priority or language %}
+        <a href="{% url 'bug_list' %}" class="btn btn-secondary btn-sm">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% for bug in bugs %}
+  <a href="{% url 'bug_detail' bug.pk %}" class="bug-card">
+    <div class="bug-card-top">
+      <span class="badge badge-{{ bug.priority }}">{{ bug.priority }}</span>
+      <span class="badge badge-{{ bug.status }}">{{ bug.status|cut:"_" }}</span>
+      <span class="lang-tag">{{ bug.language }}</span>
+      <span class="bug-card-title">{{ bug.title }}</span>
+      <span style="color:var(--text2);font-size:0.78rem;white-space:nowrap">#{{ bug.pk }}</span>
+    </div>
+    <div class="bug-card-desc">{{ bug.description|truncatewords:20 }}</div>
+    <div class="bug-card-footer">
+      <span class="user-row">
+        <span class="avatar" style="width:20px;height:20px;font-size:0.6rem">{{ bug.submitted_by.username|first|upper }}</span>
+        {{ bug.submitted_by.username }}
+      </span>
+      <span>{{ bug.created_at|timesince }} ago</span>
+      {% if bug.assigned_developer %}
+        <span>→
+          <span class="user-row" style="display:inline-flex">
+            <span class="avatar" style="width:20px;height:20px;font-size:0.6rem;background:linear-gradient(135deg,var(--green),var(--blue))">{{ bug.assigned_developer.username|first|upper }}</span>
+            {{ bug.assigned_developer.username }}
+          </span>
+        </span>
+      {% else %}
+        <span style="color:var(--yellow)">⚠ Unassigned</span>
+      {% endif %}
+      <span>{{ bug.comments.count }} comment{{ bug.comments.count|pluralize }}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty-state card">
+    <span class="big-emoji">🐛</span>
+    <h3>No bugs found</h3>
+    <p>{% if q or status or priority %}Try different filters or <a href="{% url 'bug_list' %}" style="color:var(--accent2)">clear all</a>{% else %}<a href="{% url 'bug_create' %}" style="color:var(--accent2)">Report the first bug</a>{% endif %}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

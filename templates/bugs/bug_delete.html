@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Delete Bug — BugHive{% endblock %}
+{% block content %}
+<div class="container" style="max-width:600px">
+  <div class="card" style="text-align:center;padding:3rem">
+    <div style="font-size:3rem;margin-bottom:1rem">🗑</div>
+    <h2 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:0.5rem">Delete Bug Report?</h2>
+    <p style="color:var(--text2);margin-bottom:0.5rem">You're about to permanently delete:</p>
+    <p style="font-weight:600;color:var(--text);margin-bottom:2rem">"{{ bug.title }}"</p>
+    <p style="color:var(--red);font-size:0.875rem;margin-bottom:2rem">This action cannot be undone. All comments will also be deleted.</p>
+    <div style="display:flex;gap:1rem;justify-content:center">
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      </form>
+      <a href="{% url 'bug_detail' bug.pk %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
