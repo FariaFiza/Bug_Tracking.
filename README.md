@@ -93,37 +93,6 @@ Shows user info and their submitted or assigned bugs based on role.
 
 
 
-📂 Project Structure
-
-bugtracker/
-│
-├── manage.py
-├── requirements.txt
-├── db.sqlite3
-│
-├── bugtracker/
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
-├── accounts/
-│   ├── models.py
-│   ├── views.py
-│   ├── forms.py
-│   └── urls.py
-│
-├── bugs/
-│   ├── models.py
-│   ├── views.py
-│   ├── forms.py
-│   └── urls.py
-│
-└── templates/
-    ├── base.html
-    ├── accounts/
-    │   └── login.html
-    └── bugs/
-        └── bug_list.html
 
 
 ## 📦 Getting Started
