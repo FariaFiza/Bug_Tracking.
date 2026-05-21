@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Community Feedback — BugHive{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div>
+        <h1>Community Feedback</h1>
+        <p>What our users are saying</p>
+      </div>
+      {% if user.is_authenticated %}
+        <a href="{% url 'feedback_create' %}" class="btn btn-primary">+ Add Feedback</a>
+      {% endif %}
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem">
+    {% for fb in feedbacks %}
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem">
+        <div style="color:var(--yellow);font-size:1rem">{% for i in "12345" %}{% if forloop.counter <= fb.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+        <span class="badge" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2)">{{ fb.category }}</span>
+      </div>
+      <p style="color:var(--text2);font-size:0.9rem;line-height:1.65;margin-bottom:1rem">{{ fb.message }}</p>
+      <div class="user-row">
+        <span class="avatar" style="width:24px;height:24px;font-size:0.65rem">{{ fb.submitted_by.username|first|upper }}</span>
+        <span style="font-size:0.82rem;color:var(--text2)">{{ fb.submitted_by.username }} · {{ fb.created_at|date:"M d" }}</span>
+      </div>
+    </div>
+    {% empty %}
+    <div class="card" style="text-align:center;padding:3rem;grid-column:1/-1">
+      <p style="color:var(--text2)">No public feedback yet. <a href="{% url 'feedback_create' %}" style="color:var(--accent2)">Be the first!</a></p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
