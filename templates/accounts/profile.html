@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.username }} — BugHive{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="grid-2" style="align-items:start">
+    <div>
+      <div class="card" style="margin-bottom:1.5rem">
+        <div style="display:flex;gap:1.25rem;align-items:center;margin-bottom:1.25rem">
+          <span class="avatar" style="width:64px;height:64px;font-size:1.5rem;font-family:'Syne',sans-serif;font-weight:800">{{ profile_user.username|first|upper }}</span>
+          <div>
+            <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem">{{ profile_user.username }}</h2>
+            <span class="role-badge role-{{ profile_user.role }}">{{ profile_user.get_role_display }}</span>
+            {% if profile_user.email %}
+              <div style="color:var(--text2);font-size:0.82rem;margin-top:0.25rem">{{ profile_user.email }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="info-row" style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--text2);font-size:0.85rem">Member since</span>
+          <span style="font-size:0.85rem">{{ profile_user.date_joined|date:"M d, Y" }}</span>
+        </div>
+        <div class="info-row" style="display:flex;justify-content:space-between;padding:0.5rem 0">
+          <span style="color:var(--text2);font-size:0.85rem">Total bugs</span>
+          <span style="font-size:0.85rem">{{ my_bugs.count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">
+          {% if profile_user.is_developer %}🔧 Assigned Bugs{% else %}🐛 My Bug Reports{% endif %}
+        </div>
+        {% for bug in my_bugs %}
+        <a href="{% url 'bug_detail' bug.pk %}" style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);text-decoration:none;">
+          <span class="badge badge-{{ bug.status }}" style="font-size:0.65rem">{{ bug.status }}</span>
+          <span style="color:var(--text);font-size:0.875rem;flex:1">{{ bug.title|truncatechars:40 }}</span>
+          <span class="badge badge-{{ bug.priority }}" style="font-size:0.65rem">{{ bug.priority }}</span>
+        </a>
+        {% empty %}
+          <p style="color:var(--text2);font-size:0.875rem;text-align:center;padding:1.5rem 0">
+            {% if profile_user.is_developer %}No bugs assigned yet{% else %}No bugs reported yet{% endif %}
+          </p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
